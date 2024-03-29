@@ -48,16 +48,19 @@
         function randomPoints(){
             for(let i = 0; i<71; i++){
                 if(i==0){
-                    arrayPontos.push(["Tempo","Medidas"])
+                    arrayPontos.push(["Tempo","Medidas"])//primeiro ponto precisa sempre ser a identificação dos pontos, quem é a abscissa e a ordenada regra da API
                 }else{
                     let leitura = parseInt(Math.random()*100)
                     arrayPicos.push(leitura)         
-                    arrayPontos.push([i, leitura])
+                    arrayPontos.push([i, leitura]) //adiciona o índice do array como o tempo de coleta e os pontos aleatórios de cada leitura no gráfico e 
                 }
             }
         }
-        randomPoints()
+        randomPoints()//executa a criação dos pontos
 
+        //coleta os pontos que podem ser considerado picos reais, para isso
+        //usou o conceito de que, ele só pode ser considerado pico real, se for maior que 50 e seu antecessor ou sucessor forem pontos menores que 50, o que indica uma
+        //queda e ausência de ruído com pico falso
         for(let i=1; i<arrayPontos.length; i++){
             if(i<arrayPontos.length-1){
                 if(arrayPontos[i][1]>50 && (arrayPontos[i-1][1]<=50 && arrayPontos[i+1][1]<=50)){
