@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        *{
+            margin: 0;
+            box-sizing: border-box;
+            font-family: arial;
+        }
+        body{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px
+        }
+        #myChart{
+            width: 100%;
+            height: 500px;
+        }
+        #valor, #tempo-medio{
+            font-size: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="myChart"></div>
+    <div id="tempo-medio">Tempo Médio = <span id="valor"></span></div>
+
+    <script>
+        google.charts.load('current', { packages: ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        //gerador de pontos aleatórios
+        //Variáveis de apoio
+        let arrayPontos = []
+        let arrayPicos = []
+        let arrayTempos = []
+        let somaDosPicos = 0
+
+        //Função geradora de pontos aleatórios representando o eixo das medidas aleatorias versus o tempo em segundos
+        function randomPoints(){
+            for(let i = 0; i<71; i++){
+                if(i==0){
+                    arrayPontos.push(["Tempo","Medidas"])
+                }else{
+                    let leitura = parseInt(Math.random()*100)
+                    arrayPicos.push(leitura)         
+                    arrayPontos.push([i, leitura])
+                }
+            }
+        }
+        randomPoints()
+
+        for(let i=1; i<arrayPontos.length; i++){
+            if(i<arrayPontos.length-1){
+                if(arrayPontos[i][1]>50 && (arrayPontos[i-1][1]<=50 && arrayPontos[i+1][1]<=50)){
+                    console.log("ponto: "+i+" "+ arrayPontos[i][1])
+                    arrayTempos.push(i)
+                }
+            }else{
+                if(arrayPontos[i][1]>50 && arrayPontos[i-1][1]<=50){
+                    console.log("ponto: "+i+" "+arrayPontos[i][1])
+                    arrayTempos.push(i)
+                }
+            }
+        }
+        for(let i = 0; i<arrayTempos.length; i++){
+            if(i>0){
+                somaDosPicos = somaDosPicos + (arrayTempos[i]-arrayTempos[i-1])
+                console.log(arrayTempos[i]-arrayTempos[i-1])
+            }
+        }
+        //função que transforma o tempo médio no formato mm:ss (minutos:segundos)
+        function transformaEmHoraESegundos(){
+            let tempo = somaDosPicos/(arrayTempos.length-1)
+            if(tempo >= 60){
+                return `${parseInt(tempo/60)}:0${tempo%60}`
+            }else{
+                if(tempo%60 > 10){
+                    return `00:${parseInt(tempo%60)}`
+                }else{
+                    return `00:0${parseInt(tempo%60)}`
+                }
+            }
+            
+        }
+        //inserir o valor no documento do HTML
+        document.getElementById('valor').innerHTML = transformaEmHoraESegundos()
+
+        //API da google para gerar gráfico de pontos no HTML, usando os pontos aleatórios 
+        function drawChart() {
+            // Set Data
+            const data = google.visualization.arrayToDataTable(arrayPontos);
+
+            // Set Options
+            const options = {
+                title: 'Medidas x Tempo',
+                hAxis: { title: 'Tempo(s)' },
+                vAxis: { title: 'Picos' },
+                legend: 'Medidas x Tempo'
+            };
+
+            // Draw
+            const chart = new google.visualization.LineChart(document.getElementById('myChart'));
+            chart.draw(data, options);
+
+        }
+    </script>
+</body>
+
+</html>
